@@ -4,8 +4,8 @@ from keras.models import Model
 from keras.layers import Activation, Conv2D, \
     MaxPooling2D, Input, Concatenate, Conv2DTranspose, add, ZeroPadding2D
 from keras.optimizers import Adam
-from keras.layers.normalization import BatchNormalization
-from keras.preprocessing.image import ImageDataGenerator
+from keras.layers import BatchNormalization
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 from data_utils import *
@@ -86,7 +86,7 @@ class DeepLabV2(object):
         aspp_output = Activation('softmax')(aspp_output)
 
         model = Model(inputs = inputs, outputs = aspp_output)
-        model.compile(loss='categorical_crossentropy', optimizer= Adam(lr = self.learning_rate), metrics=['accuracy'])
+        model.compile(loss='categorical_crossentropy', optimizer= Adam(learning_rate = self.learning_rate), metrics=['accuracy'])
         return model
 
     # train model
@@ -126,7 +126,7 @@ class DeepLabV2(object):
         if not os.path.exists(save_dir): # if there is no exist, make the path
             os.makedirs(save_dir)
 
-        cb_checkpoint = ModelCheckpoint(save_dir + name_model + '.h5', monitor = 'val_acc', save_best_only = True, verbose = 1)
+        cb_checkpoint = ModelCheckpoint(save_dir + name_model + '.keras', monitor = 'val_acc', save_best_only = True, verbose = 1)
         reduce_lr = ReduceLROnPlateau(monitor = 'val_acc', factor = 0.2, patience = 5, verbose = 1, min_lr = min_lr)
 
         self.history = self.model.fit_generator(train_gen,

@@ -6,7 +6,7 @@ from keras.layers import Dense, Dropout, Flatten, Activation, Lambda, Conv2D, \
 from keras.optimizers import Adam
 from keras.layers import BatchNormalization
 from keras.applications.vgg16 import VGG16
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 from data_utils import *
@@ -70,7 +70,7 @@ class FCN8s(object):
         skip_layer_sum2 = Activation('softmax')(skip_layer_sum2)
 
         model = Model(inputs = inputs, outputs = skip_layer_sum2)
-        model.compile(loss = 'categorical_crossentropy', optimizer= Adam(lr = self.learning_rate), metrics=['accuracy'])
+        model.compile(loss = 'categorical_crossentropy', optimizer= Adam(learning_rate = self.learning_rate), metrics=['accuracy'])
         return model
 
     # train model
@@ -110,7 +110,7 @@ class FCN8s(object):
         if not os.path.exists(save_dir): # if there is no exist, make the path
             os.makedirs(save_dir)
 
-        cb_checkpoint = ModelCheckpoint(save_dir + name_model + '.h5', monitor = 'val_acc', save_best_only = True, verbose = 1)
+        cb_checkpoint = ModelCheckpoint(save_dir + name_model + '.keras', monitor = 'val_acc', save_best_only = True, verbose = 1)
         reduce_lr = ReduceLROnPlateau(monitor = 'val_acc', factor = 0.2, patience = 5, verbose = 1, min_lr = min_lr)
 
         self.history = self.model.fit_generator(train_gen,

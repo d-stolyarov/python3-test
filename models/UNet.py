@@ -4,8 +4,8 @@ from keras.models import Model
 from keras.layers import Dense, Dropout, Flatten, Activation, Conv2D, \
     MaxPooling2D, Input, Concatenate, Conv2DTranspose
 from keras.optimizers import Adam
-from keras.layers.normalization import BatchNormalization
-from keras.preprocessing.image import ImageDataGenerator
+from keras.layers import BatchNormalization
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 import os
@@ -100,7 +100,7 @@ class UNet(object):
         segmented = Activation('softmax')(segmented)
 
         model = Model(inputs = inputs, outputs = segmented)
-        model.compile(optimizer = Adam(lr = self.learning_rate),
+        model.compile(optimizer = Adam(learning_rate = self.learning_rate),
                           loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
         return model
@@ -127,28 +127,29 @@ class UNet(object):
         train_gen = train_datagen.flow(
             x_train,
             y_train,
-            batch_size = batch_size,
+            batch_size=batch_size,
             shuffle=True
         )
 
         val_gen = val_datagen.flow(
             x_test,
             y_test,
-            batch_size = batch_size,
+            batch_size=batch_size,
             shuffle=False
         )
 
         save_dir = './save_model/'
-        if not os.path.exists(save_dir): # if there is no exist, make the path
+        if not os.path.exists(save_dir):  # if there is no exist, make the path
             os.makedirs(save_dir)
 
-        cb_checkpoint = ModelCheckpoint(save_dir + name_model + '.h5', monitor = 'val_acc', save_best_only = True, verbose = 1)
-        reduce_lr = ReduceLROnPlateau(monitor = 'val_acc', factor = 0.2, patience = 5, verbose = 1, min_lr = min_lr)
+        cb_checkpoint = ModelCheckpoint(save_dir + name_model + '.keras', monitor='val_acc', save_best_only=True, verbose=1)
+        reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.2, patience=5, verbose=1, min_lr=min_lr)
 
-        self.history = self.model.fit_generator(train_gen,
-                                                validation_data=val_gen,
-                                                epochs=epoch,
-                                                callbacks=[cb_checkpoint, reduce_lr])
+        # Используем метод fit вместо fit_generator
+        self.history = self.model.fit(train_gen,
+                                      validation_data=val_gen,
+                                      epochs=epoch,
+                                      callbacks=[cb_checkpoint, reduce_lr])
         return self.history
     # predict test data
     def predict(self, X_test):
