@@ -4,7 +4,7 @@ from keras.models import Model
 from keras.layers import Dense, Dropout, Flatten, Activation, Lambda, Conv2D, \
     MaxPooling2D, UpSampling2D,Input, Concatenate, Conv2DTranspose, add
 from keras.optimizers import Adam
-from keras.layers.normalization import BatchNormalization
+from keras.layers import BatchNormalization
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
